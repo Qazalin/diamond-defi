@@ -1,16 +1,15 @@
 import * as dotenv from "dotenv";
 
-import { HardhatUserConfig, task } from "hardhat/config";
+import { HardhatUserConfig, task, types } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
+import _ from "underscore";
 
 dotenv.config();
 
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
 
@@ -18,9 +17,39 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
     console.log(account.address);
   }
 });
+task("deploy-diamond", "Deploys the main diamond contract").setAction(
+  async (_, { ethers }) => {
+    const accounts = await ethers.getSigners();
+    const contractOwner = accounts[0];
 
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
+    // deploy DiamondCutFacet
+    const DiamondCutFacet = await ethers.getContractFactory("DiamondCutFacet");
+    const diamondCutFacet = await DiamondCutFacet.deploy();
+    await diamondCutFacet.deployed();
+    console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
+
+    // deploy Diamond
+    const Diamond = await ethers.getContractFactory("Diamond");
+    const diamond = await Diamond.deploy(
+      contractOwner.address,
+      diamondCutFacet.address
+    );
+    await diamond.deployed();
+    console.log("Diamond deployed:", diamond.address);
+    console.log("💎------------------------💎");
+  }
+);
+
+task("deploy-facet", "Deploys a diamond facet")
+  .addParam("name", "the name of the contract", _, types.string)
+  .addParam("diamondAddr", "the address of the diamond", _, types.string)
+  .setAction(async (taskArgs, { ethers }) => {
+    const Contract = await ethers.getContractFactory(taskArgs.name);
+    // @ts-ignore
+    const contract = await Contract.deploy();
+    await contract.deployed();
+    console.log(`👩🏻‍💻${taskArgs.name} deployed to: `, contract.address);
+  });
 
 const config: HardhatUserConfig = {
   solidity: "0.8.4",
