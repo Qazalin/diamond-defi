@@ -5,7 +5,6 @@ import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
-import "solidity-coverage";
 import _ from "underscore";
 
 dotenv.config();
@@ -48,11 +47,12 @@ task("deploy-facet", "Deploys a diamond facet")
     // @ts-ignore
     const contract = await Contract.deploy();
     await contract.deployed();
-    console.log(`👩🏻‍💻${taskArgs.name} deployed to: `, contract.address);
+    console.log(`✨${taskArgs.name} deployed to: `, contract.address);
   });
 
 const config: HardhatUserConfig = {
   solidity: "0.8.4",
+  defaultNetwork: "localhost",
   networks: {
     ropsten: {
       url: process.env.ROPSTEN_URL || "",

@@ -1,7 +1,7 @@
 /** Deploys contract A and Diamond */
 
-import { deployDiamodCut } from "../deployNewFacet";
-import { deployDiamond } from "../deployDiamond";
+import { deployDiamodCut } from "../utils/deployNewFacet";
+import { deployDiamond } from "../utils/deployDiamond";
 
 async function deployA() {
   const diamond = await deployDiamond();

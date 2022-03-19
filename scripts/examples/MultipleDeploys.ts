@@ -4,9 +4,9 @@
 import { Contract } from "ethers";
 import { ethers } from "hardhat";
 import { deployConfigType } from "../libraries/types";
-import { cutAction } from "./cutAction";
-import { deployDiamodCut } from "../deployNewFacet";
-import { deployDiamond } from "../deployDiamond";
+import { cutAction } from "../utils/cutAction";
+import { deployDiamodCut } from "../utils/deployNewFacet";
+import { deployDiamond } from "../utils/deployDiamond";
 
 const deployConfig: deployConfigType = {
   names: ["A", "B", "C"],

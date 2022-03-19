@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../../interfaces/IERC20.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "./ERC20StorageLib.sol";
 import "../../libraries/LibDiamond.sol";
@@ -10,14 +10,14 @@ contract ERC20 is IERC20 {
     /**
      * @dev Returns the name of the token
      */
-    function name() public view returns (string memory) {
+    function name() public view override returns (string memory) {
         return ERC20StorageLib.getERC20Storage().name;
     }
 
     /**
      * @dev Returns the symbol of the token
      */
-    function symbol() public view returns (string memory) {
+    function symbol() public view override returns (string memory) {
         return ERC20StorageLib.getERC20Storage().symbol;
     }
 
@@ -72,7 +72,7 @@ contract ERC20 is IERC20 {
         uint256 _supply,
         string memory _name,
         string memory _symbol
-    ) external {
+    ) external override {
         LibDiamond.DiamondStorage storage ds = LibDiamond.getDiamondStorage();
         ERC20StorageLib.ERC20Storage storage e20 = ERC20StorageLib
             .getERC20Storage();
