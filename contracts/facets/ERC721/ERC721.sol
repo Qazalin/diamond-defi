@@ -9,6 +9,8 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import "./ERC721StorageLib.sol";
+import "../../libraries/LibDiamond.sol";
 
 /**
  * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard
@@ -73,7 +75,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
             owner != address(0),
             "ERC721: address zero is not a valid owner"
         );
-        return _balances[owner];
+        return ERC20StorageLib.getERC721Storage()._balances[owner];
     }
 
     /**
@@ -86,7 +88,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         override
         returns (address)
     {
-        address owner = _owners[tokenId];
+        address owner = ERC721StorageLib.getERC721Storage()._owners[tokenId];
         require(
             owner != address(0),
             "ERC721: owner query for nonexistent token"
@@ -98,14 +100,14 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
      * @dev See {IERC721Metadata-name}.
      */
     function name() public view virtual override returns (string memory) {
-        return _name;
+        return ERC721StorageLib.getERC721Storage()._name;
     }
 
     /**
      * @dev See {IERC721Metadata-symbol}.
      */
     function symbol() public view virtual override returns (string memory) {
-        return _symbol;
+        return ERC721StorageLib.getERC721Storage()._symbol;
     }
 
     /**
@@ -169,7 +171,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
             "ERC721: approved query for nonexistent token"
         );
 
-        return _tokenApprovals[tokenId];
+        return ERC721StorageLib.getERC721Storage()._tokenApprovals[tokenId];
     }
 
     /**
@@ -193,7 +195,10 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         override
         returns (bool)
     {
-        return _operatorApprovals[owner][operator];
+        return
+            ERC721StorageLib.getERC721Storage()._operatorApprovals[owner][
+                operator
+            ];
     }
 
     /**
@@ -280,7 +285,8 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
      * and stop existing when they are burned (`_burn`).
      */
     function _exists(uint256 tokenId) internal view virtual returns (bool) {
-        return _owners[tokenId] != address(0);
+        return
+            ERC721StorageLib.getERC721Storage()._owners[tokenId] != address(0);
     }
 
     /**
@@ -354,8 +360,8 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
 
         _beforeTokenTransfer(address(0), to, tokenId);
 
-        _balances[to] += 1;
-        _owners[tokenId] = to;
+        ERC721StorageLib.getERC721Storage()._balances[to] += 1;
+        ERC721StorageLib.getERC721Storage()._owners[tokenId] = to;
 
         emit Transfer(address(0), to, tokenId);
 
@@ -380,8 +386,8 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         // Clear approvals
         _approve(address(0), tokenId);
 
-        _balances[owner] -= 1;
-        delete _owners[tokenId];
+        ERC721StorageLib.getERC721Storage()._balances[owner] -= 1;
+        delete ERC721StorageLib.getERC721Storage()._owners[tokenId];
 
         emit Transfer(owner, address(0), tokenId);
 
@@ -415,9 +421,9 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
 
-        _balances[from] -= 1;
-        _balances[to] += 1;
-        _owners[tokenId] = to;
+        ERC721StorageLib.getERC721Storage()._balances[from] -= 1;
+        ERC721StorageLib.getERC721Storage()._balances[to] += 1;
+        ERC721StorageLib.getERC721Storage()._owners[tokenId] = to;
 
         emit Transfer(from, to, tokenId);
 
@@ -430,7 +436,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
      * Emits a {Approval} event.
      */
     function _approve(address to, uint256 tokenId) internal virtual {
-        _tokenApprovals[tokenId] = to;
+        ERC721StorageLib.getERC721Storage()._tokenApprovals[tokenId] = to;
         emit Approval(ERC721.ownerOf(tokenId), to, tokenId);
     }
 
@@ -445,7 +451,9 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         bool approved
     ) internal virtual {
         require(owner != operator, "ERC721: approve to caller");
-        _operatorApprovals[owner][operator] = approved;
+        ERC721StorageLib.getERC721Storage()._operatorApprovals[owner][
+                operator
+            ] = approved;
         emit ApprovalForAll(owner, operator, approved);
     }
 
