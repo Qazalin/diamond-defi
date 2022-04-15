@@ -2,47 +2,58 @@
 // ERC721 Contracts with the diamond pattern
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/interfaces/IERC721.sol";
+
 import "@openzeppelin/contracts/interfaces/IERC721Receiver.sol";
-import "@openzeppelin/contracts/interfaces/IERC721Metadata.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import "../../interfaces/IERC721Metadata.sol";
+import "../../interfaces/IERC721.sol";
 import "./ERC721StorageLib.sol";
 import "../../libraries/LibDiamond.sol";
 
 /**
  * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard
  */
-contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
+abstract contract ERC721 is Context, ERC165, IERC721Metadata {
     using Address for address;
     using Strings for uint256;
 
-    // Token name
-    string private _name;
-
-    // Token symbol
-    string private _symbol;
-
-    // Mapping from token ID to owner address
-    mapping(uint256 => address) private _owners;
-
-    // Mapping owner address to token count
-    mapping(address => uint256) private _balances;
-
-    // Mapping from token ID to approved address
-    mapping(uint256 => address) private _tokenApprovals;
-
-    // Mapping from owner to operator approvals
-    mapping(address => mapping(address => bool)) private _operatorApprovals;
 
     /**
-     * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
+     * @dev specify the initial metadata of ERC721 token
+     * @param _name the name of the token
+     * @param _symbol the symbol of the token
+     * @param _cid the content identifier of the folder containing all JSON files.
      */
-    constructor(string memory name_, string memory symbol_) {
-        _name = name_;
-        _symbol = symbol_;
+    function initialize(
+        string memory _name,
+        string memory _symbol,
+        string memory _cid
+    ) external {
+        LibDiamond.DiamondStorage storage ds = LibDiamond.getDiamondStorage();
+        ERC721StorageLib.ERC721Storage storage e721 = ERC721StorageLib
+            .getERC721Storage();
+
+        require(
+            bytes(e721._name).length == 0 && bytes(e721._symbol).length == 0,
+            "Can't change the name of ERC721 token after initialization"
+        );
+
+        require(
+            bytes(_name).length != 0 && bytes(_symbol).length != 0 && bytes(_cid).length != 0,
+            "Invalid name and/or symbol and/or cid"
+        );
+
+        require(
+            msg.sender == ds.contractOwner,
+            "You're not allowed to do this"
+        );
+
+        e721._name = _name;
+        e721._symbol = _symbol;
+        e721._cid = _cid;
     }
 
     /**
@@ -75,7 +86,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
             owner != address(0),
             "ERC721: address zero is not a valid owner"
         );
-        return ERC20StorageLib.getERC721Storage()._balances[owner];
+        return ERC721StorageLib.getERC721Storage()._balances[owner];
     }
 
     /**
@@ -133,12 +144,12 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     }
 
     /**
-     * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
-     * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
-     * by default, can be overridden in child contracts.
+     * @dev Base URI for computing {tokenURI}. 
+    * @return the IPFS base uri from the diamond storage
      */
-    function _baseURI() internal view virtual returns (string memory) {
-        return "";
+    function _baseURI() public view returns (string memory) {
+        return string(abi.encodePacked("ipfs://", 
+                                       ERC721StorageLib.getERC721Storage()._cid));
     }
 
     /**

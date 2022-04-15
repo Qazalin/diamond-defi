@@ -2,12 +2,12 @@
 // From https://github.com/1001-digital/erc721-extensions/blob/main/contracts/WithIPFSMetaData.sol
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "../../interfaces/IERC721Metadata.sol";
 
 /// @author 1001.digital
 /// @title allows for minting NFTs with metadata stored on IPFS
-abstract contract ERC721Metadata is ERC721 {
+abstract contract ERC721Metadata is IERC721Metadata {
     using Strings for uint256;
 
     /// @dev Emitted when the content identifyer changes
@@ -27,13 +27,7 @@ abstract contract ERC721Metadata is ERC721 {
     /// @param tokenId the token id for which to get the matadata URL
     /// @dev links to the metadata json file on IPFS.
     /// @return the URL to the token metadata file
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
+    function tokenURI(uint256 tokenId) public view returns (string memory) {
         require(
             _exists(tokenId),
             "ERC721Metadata: URI query for nonexistent token"
@@ -55,7 +49,7 @@ abstract contract ERC721Metadata is ERC721 {
     /// Configure the baseURI for the tokenURI method.
     /// @dev override the standard OpenZeppelin implementation
     /// @return the IPFS base uri
-    function _baseURI() internal view virtual override returns (string memory) {
+    function _baseURI() internal view virtual returns (string memory) {
         return string(abi.encodePacked("ipfs://", cid));
     }
 
@@ -66,5 +60,16 @@ abstract contract ERC721Metadata is ERC721 {
         cid = _cid;
 
         emit MetadataURIChanged(_baseURI());
+    }
+
+    /* @dev Returns whether `tokenId` exists.
+     *
+     * Tokens can be managed by their owner or approved accounts via {approve} or {setApprovalForAll}.
+     *
+     * Tokens start existing when they are minted (`_mint`),
+     * and stop existing when they are burned (`_burn`).
+     */
+    function _exists(uint256 tokenId) internal view virtual returns (bool) {
+        return _owners[tokenId] != address(0);
     }
 }

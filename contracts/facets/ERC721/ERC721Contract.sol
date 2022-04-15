@@ -2,9 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "./ERC721Metadata.sol";
+import "../../interfaces/IERC721Metadata.sol";
 
-contract ERC721Contract is ERC721, ERC721Metadata {
+contract ERC721Contract is ERC721, IERC721Metadata {
     uint256 private tokenId = 0;
     uint256 public MAX_SUPPLY = 100;
 
