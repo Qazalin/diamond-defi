@@ -31,7 +31,7 @@ abstract contract ERC721 is Context, ERC165, IERC721Metadata {
         string memory _name,
         string memory _symbol,
         string memory _cid
-    ) external {
+    ) external override {
         LibDiamond.DiamondStorage storage ds = LibDiamond.getDiamondStorage();
         ERC721StorageLib.ERC721Storage storage e721 = ERC721StorageLib
             .getERC721Storage();
@@ -136,18 +136,24 @@ abstract contract ERC721 is Context, ERC165, IERC721Metadata {
             "ERC721Metadata: URI query for nonexistent token"
         );
 
-        string memory baseURI = _baseURI();
+        // We don't check whether the _baseURI is set like in the OpenZeppelin implementation
+        // as we're deploying the contract with the CID in the diamondStorage
         return
-            bytes(baseURI).length > 0
-                ? string(abi.encodePacked(baseURI, tokenId.toString()))
-                : "";
+            string(
+                abi.encodePacked(
+                    _baseURI(),
+                    "/",
+                    tokenId.toString(),
+                    "/metadata.json"
+                )
+            );
     }
 
     /**
      * @dev Base URI for computing {tokenURI}. 
     * @return the IPFS base uri from the diamond storage
      */
-    function _baseURI() public view returns (string memory) {
+    function _baseURI() public view override returns (string memory) {
         return string(abi.encodePacked("ipfs://", 
                                        ERC721StorageLib.getERC721Storage()._cid));
     }

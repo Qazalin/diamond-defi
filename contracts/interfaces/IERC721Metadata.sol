@@ -10,10 +10,6 @@ import "../interfaces/IERC721.sol";
 interface IERC721Metadata is IERC721 {
 
     /**
-     *  @dev Emitted when the content identifyer changes
-     */
-    event MetadataURIChanged(string indexed baseURI);
-    /**
      * @dev Returns the token collection name.
      */
     function name() external view returns (string memory);
@@ -31,5 +27,4 @@ interface IERC721Metadata is IERC721 {
 
     function _baseURI() external view returns (string memory);
 
-    function _setCID(string memory _cid) external;
 }
