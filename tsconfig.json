@@ -7,10 +7,14 @@
     "outDir": "dist",
     "declaration": true,
     "allowJs": true,
+    "baseUrl": ".",
     "paths": {
-      "@utils": ["/scripts/utils/*"]
+        "@diamond/*": [
+            "./scripts/*"
+        ]
     }
+
   },
-  "include": ["./scripts", "./test", "./typechain"],
+  "include": ["./scripts/**/*", "./test/**/*", "./typechain"],
   "files": ["./hardhat.config.ts"]
 }

@@ -16,7 +16,6 @@ const deployConfig: deployConfigType = {
 async function deployA(diamond: Contract) {
   for (let i = 0; i < deployConfig.names.length; i++) {
     const cut = await deployDiamodCut(deployConfig.names[i]);
-    await cutAction(deployConfig.actions[i], cut, diamond.address);
     console.log("----------------------------------");
   }
   console.log("deployment of all completed");

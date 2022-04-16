@@ -16,7 +16,7 @@ import "../../libraries/LibDiamond.sol";
 /**
  * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard
  */
-abstract contract ERC721 is Context, ERC165, IERC721Metadata {
+contract ERC721 is Context, ERC165, IERC721Metadata {
     using Address for address;
     using Strings for uint256;
 

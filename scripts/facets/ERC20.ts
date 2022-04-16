@@ -6,6 +6,7 @@
 import { addNewFacet } from "../utils";
 import { DIAMOND_ADDR } from "../libraries/constants";
 import { deployConfigType } from "../libraries/types";
+import "@nomiclabs/hardhat-ethers";
 import { ethers } from "hardhat";
 
 // Step 1:
@@ -16,8 +17,7 @@ const e20Config: deployConfigType = {
 
 async function initERC20() {
   const e20 = await ethers.getContractAt("IERC20", DIAMOND_ADDR);
-  let tx;
-  tx = await e20.initialize(1000, "Token", "TKN");
+  const tx = await e20.initialize(1000, "Token", "TKN");
   await tx.wait();
   console.log("Initialization of ERC20 completed");
   console.log("---------------------------");
