@@ -18,7 +18,7 @@ const testConfig: deployConfigType = {
 async function main() {
   // await deployDiamond();
   // await deployDiamodCut("Test");
-  // await addNewFacet(DIAMOND_ADDR, testConfig);
+  await addNewFacet(DIAMOND_ADDR, testConfig);
   const testContract = await ethers.getContractAt("Test", DIAMOND_ADDR);
   console.log(await testContract.getA());
   await testContract.setA(45);

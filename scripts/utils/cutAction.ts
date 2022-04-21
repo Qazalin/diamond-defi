@@ -3,7 +3,7 @@ import { getSelectors, FacetCutAction } from "../libraries/diamond.js";
 import { ethers } from "hardhat";
 
 import { ActionType, CutActionType } from "../libraries/types";
-import { ADDRESS_ZERO } from "@diamond/libraries/constants.js";
+import { ADDRESS_ZERO } from "../libraries/constants";
 
 /**
  * Diamond cut actions on the contract => Replace, Add, Remove
@@ -55,4 +55,5 @@ export async function cutAction(
     throw Error(`Diamond upgrade failed: ${tx.hash}`);
   }
   console.log("Completed diamond cut");
+  console.log(`${action}: ${contract.address}`);
 }
