@@ -18,15 +18,20 @@ const testConfig: deployConfigType = {
 async function main() {
   // await deployDiamond();
   // await deployDiamodCut("Test");
-  await addNewFacet(DIAMOND_ADDR, testConfig);
+  /* await addNewFacet(DIAMOND_ADDR, testConfig);
   const testContract = await ethers.getContractAt("Test", DIAMOND_ADDR);
   console.log(await testContract.getA());
   await testContract.setA(45);
   console.log(await testContract.getA());
-  console.log("Removing the contract...");
-  await cutAction("remove", testContract, DIAMOND_ADDR);
-  console.log("Removed");
-  console.log(await testContract.getA());
+  console.log("replacing the contract...");
+  const newContract = await deployDiamodCut("Test2");
+  console.log("Deployed new contract: ", newContract);
+  await cutAction("replace", newContract, DIAMOND_ADDR);
+  console.log("replaced"); */
+  const newContract = await ethers.getContractAt("Test2", DIAMOND_ADDR);
+  console.log("A is: ", await newContract.getA());
+  console.log("Setting a with arg: 2", await newContract.setA(2));
+  console.log("A is: ", await newContract.getA());
 }
 main()
   .then(() => process.exit(0))
