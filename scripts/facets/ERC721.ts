@@ -1,3 +1,4 @@
+/* eslint no-process-exit: "off" */
 import { ethers } from "hardhat";
 import "@nomiclabs/hardhat-ethers";
 import { deployDiamodCut, deployDiamond, addNewFacet } from "../utils";
@@ -11,11 +12,6 @@ const e721Config: deployConfigType = {
 /**
  * adds the erc721 contract to the diamond
  */
-async function deployErc721() {
-  const diamond = await deployDiamond();
-  const cut = await deployDiamodCut("ERC721");
-}
-
 async function initERC721() {
   const e721 = await ethers.getContractAt("IERC721Metadata", DIAMOND_ADDR);
   const tx = await e721.initialize("NFT", "FT", "35205820842084010");
@@ -26,5 +22,20 @@ async function initERC721() {
   console.log(`The token's base URI is: ${await e721._baseURI()}`);
 }
 
-// deployErc721();
-addNewFacet(DIAMOND_ADDR, e721Config).then(() => initERC721());
+async function mintNFT() {
+  const nft = await ethers.getContractAt("IERC721", DIAMOND_ADDR);
+  console.log(await nft.mint());
+}
+
+async function main() {
+  // await deployDiamond();
+  // await deployDiamodCut("ERC721")
+  await addNewFacet(DIAMOND_ADDR, e721Config);
+  await initERC721();
+}
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });

@@ -1,6 +1,5 @@
 import { Contract } from "ethers";
 import { ethers } from "hardhat";
-import { deployDiamodCut } from "./deployNewFacet";
 
 /**
  * Prints the storage slots of a contract
@@ -9,7 +8,11 @@ import { deployDiamodCut } from "./deployNewFacet";
  * @param name
  * @param count the number of storage slots
  */
-async function printStorage(contract: Contract, name: string, count: number) {
+export async function printStorage(
+  contract: Contract,
+  name: string,
+  count: number
+) {
   for (let i = 0; i < count; i++) {
     console.log(
       name,
@@ -18,8 +21,9 @@ async function printStorage(contract: Contract, name: string, count: number) {
     );
   }
 }
-async function deployTest(contract: Contract) {
-  const store1 = await contract.getStorage1();
+// Example
+/* async function deployTest(contract: Contract) {
+  const store1 = await contract.getStorage();
   const store2 = await contract.getStorage2();
   console.log("the result of kaccak is: ", store1);
   console.log("the result of kaccak is: ", store2);
@@ -27,4 +31,4 @@ async function deployTest(contract: Contract) {
   await printStorage(contract, "Test", 3);
 }
 
-deployDiamodCut("Test").then(deployTest);
+deployDiamodCut("Test").then(deployTest); */

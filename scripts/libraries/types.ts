@@ -4,3 +4,9 @@ export type deployConfigType = {
   names: string[];
   actions: ActionType[];
 };
+
+export type CutActionType = {
+  facetAddress: string;
+  action: number;
+  functionSelectors: any[];
+};

@@ -2,7 +2,6 @@
 // ERC721 Contracts with the diamond pattern
 pragma solidity ^0.8.0;
 
-
 import "@openzeppelin/contracts/interfaces/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
@@ -16,21 +15,24 @@ import "../../libraries/LibDiamond.sol";
 /**
  * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard
  */
-contract ERC721 is Context, ERC165, IERC721Metadata {
+contract ERC721 is IERC721Metadata, Context, ERC165 {
     using Address for address;
     using Strings for uint256;
 
+    uint256 public immutable PRICE = 0.06 ether;
 
     /**
      * @dev specify the initial metadata of ERC721 token
      * @param _name the name of the token
      * @param _symbol the symbol of the token
      * @param _cid the content identifier of the folder containing all JSON files.
+     * @param _totalSupply the total supply of token
      */
     function initialize(
         string memory _name,
         string memory _symbol,
-        string memory _cid
+        string memory _cid,
+        uint256  _totalSupply
     ) external override {
         LibDiamond.DiamondStorage storage ds = LibDiamond.getDiamondStorage();
         ERC721StorageLib.ERC721Storage storage e721 = ERC721StorageLib
@@ -42,7 +44,9 @@ contract ERC721 is Context, ERC165, IERC721Metadata {
         );
 
         require(
-            bytes(_name).length != 0 && bytes(_symbol).length != 0 && bytes(_cid).length != 0,
+            bytes(_name).length != 0 &&
+                bytes(_symbol).length != 0 &&
+                bytes(_cid).length != 0,
             "Invalid name and/or symbol and/or cid"
         );
 
@@ -54,8 +58,22 @@ contract ERC721 is Context, ERC165, IERC721Metadata {
         e721._name = _name;
         e721._symbol = _symbol;
         e721._cid = _cid;
+        e721._totalSupply = _totalSupply;
     }
 
+    /**
+     * @dev Function to mint tokens
+     * @param numberOfTokens The total number of tokens minting
+     */
+     function mint(uint numberOfTokens) public payable {
+        uint256 MAX_SUPPLY = ERC721StorageLib.getERC721Storage()._totalSupply;
+        uint256 ts = totalSupply();
+        require(ts + numberOfTokens <= MAX_SUPPLY, "Purchase would exceed max tokens");
+
+        for (uint256 i = 0; i < numberOfTokens; i++) {
+            _safeMint(msg.sender, ts + i);
+        }
+    }
     /**
      * @dev See {IERC165-supportsInterface}.
      */
@@ -88,6 +106,13 @@ contract ERC721 is Context, ERC165, IERC721Metadata {
         );
         return ERC721StorageLib.getERC721Storage()._balances[owner];
     }
+
+    /**
+      * @dev the total supply of the tokens
+      */
+     function totalSupply() public view override returns(uint) {
+        return ERC721StorageLib.getERC721Storage()._totalSupply;
+     }
 
     /**
      * @dev See {IERC721-ownerOf}.
@@ -150,12 +175,17 @@ contract ERC721 is Context, ERC165, IERC721Metadata {
     }
 
     /**
-     * @dev Base URI for computing {tokenURI}. 
-    * @return the IPFS base uri from the diamond storage
+     * @dev Base URI for computing {tokenURI}.
+     * @return the IPFS base uri from the diamond storage
      */
     function _baseURI() public view override returns (string memory) {
-        return string(abi.encodePacked("ipfs://", 
-                                       ERC721StorageLib.getERC721Storage()._cid));
+        return
+            string(
+                abi.encodePacked(
+                    "ipfs://",
+                    ERC721StorageLib.getERC721Storage()._cid
+                )
+            );
     }
 
     /**

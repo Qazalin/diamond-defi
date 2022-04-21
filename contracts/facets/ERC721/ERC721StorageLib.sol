@@ -9,6 +9,9 @@ library ERC721StorageLib {
         string _symbol;
         // Token Json metadata parent
         string _cid;
+
+        // Total supply
+        uint256 _totalSupply;
         // Mapping from token ID to owner address
         mapping(uint256 => address) _owners;
         // Mapping owner address to token count

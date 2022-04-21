@@ -27,16 +27,23 @@ interface IERC721 is IERC165 {
      * @param _name the name of the token
      * @param _symbol the symbol of the token
      * @param _cid the content identifier of the folder containing all JSON files.
+     * @param _totalSupply the total supply of tokens
      */
     function initialize(
         string memory _name,
         string memory _symbol,
-        string memory _cid
+        string memory _cid,
+        uint256 _totalSupply
     ) external;
     /**
      * @dev Returns the number of tokens in ``owner``'s account.
      */
     function balanceOf(address owner) external view returns (uint256 balance);
+
+    /**
+      * @dev  the total supply of NFTs
+    */
+   function totalSupply() external view returns (uint256 totalSupply);
 
     /**
      * @dev Returns the owner of the `tokenId` token.
